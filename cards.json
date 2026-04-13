@@ -1,0 +1,36 @@
+[
+{
+  "id": "string-unique-id",
+
+  "type": "ability",
+
+  "title": "Название карточки",
+  "summary": "Короткое описание (1 строка)",
+  "text": "Основной текст карточки",
+
+  "tags": ["tag1", "tag2"],
+
+  "links": [
+    {
+      "type": "uses",
+      "target": "target-card-id"
+    },
+    {
+      "type": "modifies",
+      "target": "target-card-id"
+    }
+  ],
+
+  "view": {
+    "x": 100,
+    "y": 100,
+    "color": "#ffaa00",
+    "collapsed": false
+  },
+
+  "meta": {
+    "createdAt": 1710000000,
+    "updatedAt": 1710000000
+  }
+}
+]
