@@ -2,22 +2,48 @@
 {
   "id": "string-unique-id",
 
-  "type": "ability",
+  "type": "meta",
 
-  "title": "Название карточки",
-  "summary": "Короткое описание (1 строка)",
-  "text": "Основной текст карточки",
+  "title": "Это тестовая карточка",
+  "summary": "Тестовая карточка",
+  "text": "Если Вы нашли это, в Ваши руки попал редкий образец",
 
   "tags": ["tag1", "tag2"],
 
   "links": [
     {
-      "type": "uses",
-      "target": "target-card-id"
-    },
+      "type": "alternative",
+      "target": "string-unique-id-2"
+    }
+  ],
+
+  "view": {
+    "x": 100,
+    "y": 100,
+    "color": "#ffaa00",
+    "collapsed": false
+  },
+
+  "meta": {
+    "createdAt": 1710000000,
+    "updatedAt": 1710000000
+  }
+},
+{
+  "id": "string-unique-id-2",
+
+  "type": "meta",
+
+  "title": "Это вторая тестовая карточка",
+  "summary": "Тестовая карточка номер 2",
+  "text": "Если Вы нашли это, в Ваши руки попал редкий образец",
+
+  "tags": ["tag1", "tag2"],
+
+  "links": [
     {
-      "type": "modifies",
-      "target": "target-card-id"
+      "type": "alternative",
+      "target": "string-unique-id"
     }
   ],
 
