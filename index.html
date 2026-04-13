@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Sword Bound Codex</title>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #121212;
+  color: #e0e0e0;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  height: 100vh;
+}
+
+/* LEFT */
+#nav {
+  border-right: 1px solid #333;
+  padding: 10px;
+}
+
+/* CENTER */
+#content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* RIGHT */
+#sidebar {
+  border-left: 1px solid #333;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+/* KEYWORDS */
+.kw {
+  cursor: pointer;
+  border-bottom: 1px dashed #888;
+}
+
+.kw:hover {
+  color: #fff;
+}
+
+.kw.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* CARDS */
+.card {
+  border-left: 4px solid;
+  background: #1e1e1e;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.card-header button:hover {
+  color: white;
+}
+
+.section-title {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 10px 0 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LEFT -->
+  <div id="nav"></div>
+
+  <!-- CENTER -->
+  <div id="content">Загрузка...</div>
+
+  <!-- RIGHT -->
+  <div id="sidebar">
+    <div class="section-title">Закрепленные</div>
+    <div id="pinned"></div>
+
+    <div class="section-title">Открытые</div>
+    <div id="open"></div>
+  </div>
+
+</div>
+
+<script>
+
+/* ---------- CONFIG ---------- */
+
+const pages = [
+  { title: "Бой", file: "combat.md" },
+  { title: "Состояния", file: "states.md" }
+];
+
+/* ---------- STATE ---------- */
+
+const state = {
+  pinned: new Set(),
+  open: new Set()
+};
+
+let keywords = {};
+
+/* ---------- INIT ---------- */
+
+init();
+
+async function init() {
+  await loadKeywords();
+  buildNav();
+  loadFromURL();
+  loadPinned();
+}
+
+/* ---------- LOAD DATA ---------- */
+
+async function loadKeywords() {
+  const res = await fetch('./data/keywords.json');
+  keywords = await res.json();
+}
+
+/* ---------- NAV ---------- */
+
+function buildNav() {
+  const nav = document.getElementById('nav');
+
+  pages.forEach(p => {
+    const el = document.createElement('div');
+    el.textContent = p.title;
+    el.style.cursor = 'pointer';
+    el.onclick = () => loadPage(p.file);
+    nav.appendChild(el);
+  });
+}
+
+/* ---------- PAGE LOAD ---------- */
+
+async function loadPage(file) {
+  const res = await fetch('./md/' + file);
+  let md = await res.text();
+
+  let html = marked.parse(md);
+
+  html = html.replace(
+    /<kw key="(.*?)">(.*?)<\/kw>/g,
+    '<span class="kw" data-key="$1">$2</span>'
+  );
+
+  document.getElementById('content').innerHTML = html;
+
+  bindKeywords();
+
+  state.open.clear();
+  document.getElementById('open').innerHTML = '';
+
+  updateURL(file);
+}
+
+/* ---------- KEYWORDS ---------- */
+
+function bindKeywords() {
+  document.querySelectorAll('.kw').forEach(el => {
+    el.onclick = () => onKeywordClick(el.dataset.key);
+  });
+}
+
+function onKeywordClick(key) {
+  if (state.open.has(key) || state.pinned.has(key)) return;
+
+  if (state.open.size >= 3) {
+    const first = state.open.values().next().value;
+    removeCard(first);
+  }
+
+  state.open.add(key);
+  renderCard(key, false);
+  disableKeyword(key);
+}
+
+function disableKeyword(key) {
+  document.querySelectorAll(`[data-key="${key}"]`)
+    .forEach(el => el.classList.add('disabled'));
+}
+
+function enableKeyword(key) {
+  document.querySelectorAll(`[data-key="${key}"]`)
+    .forEach(el => el.classList.remove('disabled'));
+}
+
+/* ---------- CARDS ---------- */
+
+function renderCard(key, pinned) {
+  const data = keywords[key];
+  if (!data) return;
+
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.dataset.key = key;
+  el.style.borderColor = data.color;
+
+  el.innerHTML = `
+    <div class="card-header">
+      <span>${data.title}</span>
+      <div>
+        <button class="pin">📌</button>
+        <button class="close">✖</button>
+      </div>
+    </div>
+    <div>${data.description}</div>
+  `;
+
+  el.querySelector('.pin').onclick = () => pinCard(key, el);
+  el.querySelector('.close').onclick = () => removeCard(key);
+
+  if (pinned) {
+    document.getElementById('pinned').appendChild(el);
+  } else {
+    document.getElementById('open').appendChild(el);
+  }
+}
+
+function pinCard(key, el) {
+  state.open.delete(key);
+  state.pinned.add(key);
+
+  document.getElementById('pinned').appendChild(el);
+
+  savePinned();
+}
+
+function removeCard(key) {
+  state.open.delete(key);
+  state.pinned.delete(key);
+
+  document.querySelector(`.card[data-key="${key}"]`)?.remove();
+
+  enableKeyword(key);
+
+  savePinned();
+}
+
+/* ---------- STORAGE ---------- */
+
+function savePinned() {
+  localStorage.setItem(
+    'sb_pinned',
+    JSON.stringify([...state.pinned])
+  );
+}
+
+function loadPinned() {
+  const saved = JSON.parse(localStorage.getItem('sb_pinned') || '[]');
+
+  saved.forEach(key => {
+    state.pinned.add(key);
+    renderCard(key, true);
+  });
+}
+
+/* ---------- URL ---------- */
+
+function loadFromURL() {
+  const params = new URLSearchParams(location.search);
+
+  const page = params.get('page') || 'combat.md';
+  const pinned = (params.get('pinned') || '').split(',');
+
+  loadPage(page);
+
+  pinned.forEach(k => {
+    if (k) {
+      state.pinned.add(k);
+      renderCard(k, true);
+    }
+  });
+}
+
+function updateURL(file) {
+  const pinned = [...state.pinned].join(',');
+
+  const url = `?page=${file}&pinned=${pinned}`;
+  history.replaceState(null, '', url);
+}
+
+</script>
+
+</body>
+</html>
