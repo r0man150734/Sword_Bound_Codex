@@ -1,0 +1,114 @@
+{
+"total-card-list": {
+"untyped-cards": [
+{
+  "id": "string-unique-id",
+
+  "type": "meta",
+
+  "title": "Это тестовая карточка",
+  "summary": "Тестовая карточка",
+  "text": "Если Вы нашли это, в Ваши руки попал редкий образец",
+
+  "tags": ["tag1", "tag2"],
+
+  "links": [
+    {
+      "type": "alternative",
+      "target": "string-unique-id-2"
+    }
+  ],
+
+  "view": {
+    "x": 100,
+    "y": 100,
+    "color": "#ffaa00",
+    "collapsed": false
+  },
+
+  "meta": {
+    "createdAt": 1710000000,
+    "updatedAt": 1710000000
+  }
+},
+{
+  "id": "string-unique-id-2",
+
+  "type": "meta",
+
+  "title": "Это вторая тестовая карточка",
+  "summary": "Тестовая карточка номер 2",
+  "text": "Если Вы нашли это, в Ваши руки попал редкий образец",
+
+  "tags": ["tag1", "tag2"],
+
+  "links": [
+    {
+      "type": "alternative",
+      "target": "string-unique-id"
+    }
+  ],
+
+  "view": {
+    "x": 100,
+    "y": 100,
+    "color": "#ffaa00",
+    "collapsed": false
+  },
+
+  "meta": {
+    "createdAt": 1710000000,
+    "updatedAt": 1710000000
+  }
+}
+],
+
+"weapon-cards": [
+  {
+  "id": "weaponID-0",
+
+  "type": "weapon",
+
+  "title": "Это тестовая карточка оружия",
+  "summary": "Тестовое оружие",
+  "text": "Описание оружия",
+
+  "tags": ["tag1", "tag2"],
+  
+  "difficulty": "Паж",
+  "rarity": "Обычный",
+  "magicness": "Обыденный",
+
+  "atacks": [
+    {
+      "Range": "1x+/",
+      "Name": "Atack Name",
+      "Damage": "5 КОЛ РУБ ДРБ РВЩ НЕЛ БОЛ ЖГЩ",
+      "ATC Atributes": "ТЕЛ + ЛВК",
+      "ATC properties": " Особенность атаки <br>вторая особеность"
+    }
+  ],
+
+  "properties": "<b>Название:</b> свойство<br> <b>Еще название:</b> второе свойство",
+
+  "links": [
+    {
+      "type": "",
+      "target": ""
+    }
+  ],
+
+  "view": {
+    "x": 100,
+    "y": 100,
+    "color": "#ffaa00",
+    "collapsed": false
+  },
+
+  "meta": {
+    "createdAt": 1710000000,
+    "updatedAt": 1710000000
+  }
+}
+]
+}}
