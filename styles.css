@@ -49,7 +49,7 @@ body {
   position: absolute;
   min-width: 180px;
   max-width: 500px;
-  min-height:120px;
+  min-height:500px;
   background: #f1b269;
   border: 2px solid #6e0000;
   border-radius: 8px;
