@@ -47,13 +47,14 @@ body {
 /* Card */
 .card {
   position: absolute;
-  width: 180px;
-  min-height: 100px;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  min-width: 180px;
+  max-width: 500px;
+  min-height:120px;
+  background: #f1b269;
+  border: 2px solid #6e0000;
   border-radius: 8px;
   padding: 10px;
-  color: white;
+  color: rgb(0, 0, 0);
   cursor: grab;
   user-select: none;
 }
@@ -70,4 +71,47 @@ body {
 .card-content {
   font-size: 14px;
   opacity: 0.8;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-delete {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.card-delete:hover {
+  opacity: 1;
+}
+
+/* Обеспечиваем вертикальную прокрутку для списка кнопок */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+#cardList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* weapon card */
+
+.attack-formula {
+  margin-left: 20px;
+}
+.attack-properties{
+  margin-left: 20px;
+}
+.card-lables{
+  font-size: small;
 }

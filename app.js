@@ -7,7 +7,11 @@ let cardsData = [];
 fetch("./cards.json")
   .then(res => res.json())
   .then(data => {
-    cardsData = data;
+    const totalList = data["total-card-list"];
+
+    // превращаем объект категорий в один массив
+    cardsData = Object.values(totalList).flat();
+
     renderSidebar();
   })
   .catch(err => console.error("Ошибка загрузки cards.json:", err));
@@ -34,22 +38,88 @@ function createCard(cardData) {
   const card = document.createElement("div");
   card.classList.add("card");
 
-  // позиция из JSON (с fallback)
   const x = cardData.view?.x ?? 100;
   const y = cardData.view?.y ?? 100;
 
   card.style.left = x + "px";
   card.style.top = y + "px";
-  card.style.background = cardData.view?.color || "#333";
 
+  switch (cardData.type){
+    case 'weapon':
+
+  // Формируем HTML для всех атак
+  const attacksHtml = (cardData.atacks || []).map(attack => {
+    const formula = attack["ATC Atributes"] 
+      ? `(${attack["ATC Atributes"]})` 
+      : '';
+    const attackProps = attack["ATC properties"] || '';
+    
+    const range = attack["Range"]
+
+    return `
+      <div class="weapon-attack">
+        <div class="attack-name">
+          [${attack.Range}] ${attack.Name} \\ <b>урон: ${attack.Damage}</b>
+        </div>
+        ${formula ? `<div class="attack-formula">${formula}</div>` : ''}
+        ${attackProps ? `<div class="attack-properties">${attackProps}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  const propertiesHtml = cardData.properties 
+    ? `<div class="weapon-properties"${cardData.properties}</div>` 
+    : '';
+
+
+  const descriptionHtml = cardData.text 
+    ? `<div class="weapon-description">${cardData.text}</div>` 
+    : '';
+
+  // Собираем итоговую карточку
   card.innerHTML = `
-    <div class="card-title">${cardData.title}</div>
-    <div class="card-content">${cardData.summary || ""}</div>
+    <div class="card-header">
+      <div class="card-title">${cardData.title}</div>
+      <button class="card-delete">×</button>
+    </div>
+    <div class="card-lables">
+      ${cardData.difficulty} ${cardData.rarity} ${cardData.magicness}
+    </div>
+
+    <br>
+
+    <div class="card-content">
+      ${attacksHtml}
+      ${propertiesHtml}
+      ${descriptionHtml}
+    </div>
   `;
+  break;
+    default:
+      card.innerHTML = `
+      <div class="card-header">
+        <div class="card-title">${cardData.title}</div>
+        <button class="card-delete">×</button>
+      </div>
+      <div class="card-content">${cardData.text || ""}</div>
+    `;
+  }
+
+  
+
+  // удаление карточки
+  const deleteBtn = card.querySelector(".card-delete");
+  deleteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    removeCard(card);
+  });
 
   makeDraggable(card);
-
   canvas.appendChild(card);
+}
+
+function removeCard(cardElement) {
+  cardElement.remove();
 }
 
 /* Drag logic */
